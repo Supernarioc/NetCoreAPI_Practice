@@ -1,6 +1,6 @@
 # NetCoreAPI_Practice
 NetCore(3.0) Web API with local DB
-Basic function with [GET]/[POST]/[DELETE]
+Basic function with [GET]()/[POST]()/[DELETE]()
 ## API Route: 
 ### GET
 /user --- list of all user</br>
