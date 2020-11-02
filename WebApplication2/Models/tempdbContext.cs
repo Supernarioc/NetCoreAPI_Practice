@@ -49,15 +49,28 @@ namespace WebApplication2.Models
         }
 
         partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
-
+        /// <summary>
+        /// search user by name
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
         public async Task<User> GetUserAsync(string name)
         {
             return await this.User.Where(t => t.Name.Equals(name)).FirstOrDefaultAsync();
         }
+        /// <summary>
+        /// get user with id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         public async Task<User> GetUserAsync(int id)
         {
             return await this.User.Where(t => t.Id.Equals(id)).FirstOrDefaultAsync();
         }
+        /// <summary>
+        /// get all user
+        /// </summary>
+        /// <returns></returns>
         public async Task<IEnumerable<User>> GetUsersAsync()
         {
             return await this.User.ToListAsync();
@@ -80,6 +93,7 @@ namespace WebApplication2.Models
             var _ur = this.User.Where(t=>t.Id.Equals(id)).FirstOrDefault();
             //remove if not null
             this.User.Remove(_ur);
+            this.SaveChanges();
         }
     }
 }
