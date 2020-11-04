@@ -12,10 +12,6 @@ namespace WebApplication2.Models
 {
     public partial class tempdbContext : DbContext
     {
-        public tempdbContext()
-        {
-        }
-
         public tempdbContext(DbContextOptions<tempdbContext> options)
             : base(options)
         {
@@ -23,13 +19,15 @@ namespace WebApplication2.Models
 
         public virtual DbSet<User> User { get; set; }
 
+        public virtual DbSet<Login> Login { get; set; }
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            if (!optionsBuilder.IsConfigured)
-            {
-                //#warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-                optionsBuilder.UseSqlServer("Server=.\\SQLExpress;Database=tempdb;Trusted_Connection=True;");
-            }
+            //if (!optionsBuilder.IsConfigured)
+            //{
+            //    //#warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
+            //    optionsBuilder.UseSqlServer("Server=.\\SQLExpress;Database=tempdb;Trusted_Connection=True;");
+            //}
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -44,6 +42,10 @@ namespace WebApplication2.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
             });
+
+            //modelBuilder.Entity<Login>().HasData(
+            //    new { id = new Guid., name = "admin", pwd = "admin",lastlogin = Convert.ToDateTime("2020-01-01") }
+            //);
 
             OnModelCreatingPartial(modelBuilder);
         }
@@ -94,6 +96,12 @@ namespace WebApplication2.Models
             //remove if not null
             this.User.Remove(_ur);
             this.SaveChanges();
+        }
+
+        public Login GetLogin(AuthenticateRequest login)
+        {
+            var log = this.Login.Where(t => t.name.Equals(login.Username)).FirstOrDefault();
+            return log.pwd.Equals(login.Password) ? log : null;
         }
     }
 }

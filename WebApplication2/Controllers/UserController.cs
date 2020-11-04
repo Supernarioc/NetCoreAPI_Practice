@@ -5,9 +5,11 @@ using System.Security.AccessControl;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.Extensions.Logging;
 using WebApplication2.Models;
+using WebApplication2.Service;
 
 namespace WebApplication2.Controllers
 {
@@ -15,20 +17,33 @@ namespace WebApplication2.Controllers
     public class UserController : ControllerBase
     {
         private readonly tempdbContext context;
-        
-        public UserController()
+        private readonly IUserService _userservice;
+        public UserController(tempdbContext _context,IUserService userService)
         {
-            context = new tempdbContext();
+            context = _context;
+            _userservice = userService;
         }
 
         [Route("/")]
         [HttpGet]
+        [ApiVersion("1.0",Deprecated = true)]
         public IActionResult Index() {
             return StatusCode(200,"NetCore 3.0 API");
         }
+
+        //[Authorize]
+        [Route("token")]
+        public IActionResult GetToken([FromBody] AuthenticateRequest request) {
+            var resp = _userservice.Authenticate(request, this.context);
+            if (resp == null)
+                return BadRequest(new { message = "Authorized failed" });
+            return StatusCode(200, resp);
+        }
+        
         [Route("[controller]")]
         [HttpGet]
         public async Task<object> GetUsers() {
+            
             return await context.GetUsersAsync();
         }
 
@@ -39,7 +54,7 @@ namespace WebApplication2.Controllers
            yield return await context.GetUserAsync(name);
         }
 
-        //[Authorize] TODO:add authorize
+        [Authorize]
         [Route("[controller]")]
         [HttpPost("add")]
         public async Task<IActionResult> AddUser([FromBody] User _newuser) {
@@ -53,9 +68,10 @@ namespace WebApplication2.Controllers
                 return BadRequest("User Already Exists");
             //add user in db
             var res = context.AddUser(_newuser);
-            return StatusCode(200, _newuser);
+            return Ok(_newuser);
         }
 
+        [Authorize]
         [Route("[controller]")]
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> DeleteUser(int id) {
@@ -70,7 +86,7 @@ namespace WebApplication2.Controllers
             {
                 return StatusCode(500, "Error " + ex.Message);
             }
-            return StatusCode(200,"User id "+id+" deleted.");
+            return Ok("User id "+id+" deleted.");
         }
     }
 }
