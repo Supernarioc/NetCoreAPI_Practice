@@ -29,6 +29,7 @@ Basic function with [GET]()/[POST]()/[DELETE]()
 }
 ```
 ### DELETE
-/{id} --- delete user by id
+/user/{id} --- delete user by id
+
 
 :zzz:
