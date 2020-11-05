@@ -16,14 +16,14 @@ Basic function with [GET]()/[POST]()/[DELETE]()
 /login --- login to api get authorized token
 ```json
 {
-    "name":"loginName",
-    "pwd":"pwd",
+    "loginname":"loginName",
+    "loginpwd":"pwd",
 }
 ```
 /login/add --- add new role to login
 ```json
 {
-    "name":"loginName",
+    "name":"Name",
     "pwd":"pwd",
     "role":"role"
 }
