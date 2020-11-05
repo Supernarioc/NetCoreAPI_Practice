@@ -36,7 +36,7 @@ namespace WebApplication2.Controllers
 
         [HttpPost]
         [AllowAnonymous]
-        public IActionResult Login([FromBody] Login login)
+        public IActionResult Login([FromBody] LoginUser login)
         {
             IActionResult response = Unauthorized();
             Login _login = AuthenticateUser(login);
@@ -60,7 +60,7 @@ namespace WebApplication2.Controllers
             _tempdbContext.AddLogin(login);
             return login;
         }
-        Login AuthenticateUser(Login loginCredentials)
+        Login AuthenticateUser(LoginUser loginCredentials)
         {
             var login_dt = _tempdbContext.GetLogin(loginCredentials);
             return login_dt;

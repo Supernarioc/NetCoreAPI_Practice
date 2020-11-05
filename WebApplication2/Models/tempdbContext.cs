@@ -119,9 +119,11 @@ namespace WebApplication2.Models
             this.SaveChanges();
         }
 
-        public Login GetLogin(Login login)
+        public Login GetLogin(LoginUser login)
         {
-            var log = this.Login.Where(t=>t.name.Equals(login.name)).FirstOrDefault();
+            var log = this.Login.Where(t=>t.name.Equals(login.LoginName)).FirstOrDefault();
+            if (!log.pwd.Equals(login.LoginPwd))
+                return null;
             log.lastlogin = DateTime.Now;
             //update login time
             this.Login.Update(log);
