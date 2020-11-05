@@ -9,19 +9,18 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.Extensions.Logging;
 using WebApplication2.Models;
-using WebApplication2.Service;
+using JWTAuthenticationExample.Models;
 
 namespace WebApplication2.Controllers
 {
     [ApiController]
+    [Route("[controller]")]
     public class UserController : ControllerBase
     {
         private readonly tempdbContext context;
-        private readonly IUserService _userservice;
-        public UserController(tempdbContext _context,IUserService userService)
+        public UserController(tempdbContext _context)
         {
             context = _context;
-            _userservice = userService;
         }
 
         [Route("/")]
@@ -30,32 +29,36 @@ namespace WebApplication2.Controllers
         public IActionResult Index() {
             return StatusCode(200,"NetCore 3.0 API");
         }
-
-        //[Authorize]
-        [Route("token")]
-        public IActionResult GetToken([FromBody] AuthenticateRequest request) {
-            var resp = _userservice.Authenticate(request, this.context);
-            if (resp == null)
-                return BadRequest(new { message = "Authorized failed" });
-            return StatusCode(200, resp);
-        }
         
-        [Route("[controller]")]
+        /// <summary>
+        /// get all users
+        /// </summary>
+        /// <returns></returns>
+        [Route("users")]
         [HttpGet]
         public async Task<object> GetUsers() {
-            
-            return await context.GetUsersAsync();
+            var res = await context.GetUsersAsync();
+            return res;
         }
 
-        [Route("[controller]/{name?}")]
+        /// <summary>
+        /// get user by name
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        [Route("{name?}")]
         [HttpGet("{name}")]
         public async IAsyncEnumerable<User> GetUser(string name)
         {
            yield return await context.GetUserAsync(name);
         }
 
-        [Authorize]
-        [Route("[controller]")]
+        /// <summary>
+        /// add new user
+        /// </summary>
+        /// <param name="_newuser"></param>
+        /// <returns></returns>
+        [Authorize(Policy = Policies.Admin)]
         [HttpPost("add")]
         public async Task<IActionResult> AddUser([FromBody] User _newuser) {
             //check if info is empty
@@ -71,8 +74,12 @@ namespace WebApplication2.Controllers
             return Ok(_newuser);
         }
 
-        [Authorize]
-        [Route("[controller]")]
+        /// <summary>
+        /// Delete user from db
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [Authorize(Policy = Policies.Admin)]
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> DeleteUser(int id) {
             try

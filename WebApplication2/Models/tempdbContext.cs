@@ -41,8 +41,29 @@ namespace WebApplication2.Models
                 entity.Property(e => e.Name)
                     .HasMaxLength(50)
                     .IsUnicode(false);
+
+                entity.Property(e => e.Id);
             });
 
+            modelBuilder.Entity<Login>(entity =>
+            {
+                entity.Property(e => e.id)
+                    .HasDefaultValueSql("NEWID()");
+
+                entity.Property(e => e.name)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.pwd)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.role)
+                    .HasMaxLength(10)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.lastlogin);
+            });
             //modelBuilder.Entity<Login>().HasData(
             //    new { id = new Guid., name = "admin", pwd = "admin",lastlogin = Convert.ToDateTime("2020-01-01") }
             //);
@@ -98,10 +119,19 @@ namespace WebApplication2.Models
             this.SaveChanges();
         }
 
-        public Login GetLogin(AuthenticateRequest login)
+        public Login GetLogin(Login login)
         {
-            var log = this.Login.Where(t => t.name.Equals(login.Username)).FirstOrDefault();
-            return log.pwd.Equals(login.Password) ? log : null;
+            var log = this.Login.Where(t=>t.name.Equals(login.name)).FirstOrDefault();
+            log.lastlogin = DateTime.Now;
+            //update login time
+            this.Login.Update(log);
+            this.SaveChanges();
+            return log;
+        }
+
+        public void AddLogin(Login login) {
+            this.Login.Add(login);
+            this.SaveChanges();
         }
     }
 }
